@@ -119,11 +119,18 @@
         /* Unicorn mascot */
         .unicorn {
             position: absolute;
-            top: -80px;
+            top: -100px;
             right: 30px;
-            font-size: 8em;
+            width: 200px;
+            height: 200px;
             animation: unicornFloat 3s ease-in-out infinite;
             filter: drop-shadow(0 8px 15px rgba(0,0,0,0.3));
+        }
+
+        .unicorn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         @keyframes unicornFloat {
@@ -152,20 +159,50 @@
 
         .page {
             display: none;
-            animation: fadeIn 0.5s;
             flex: 1;
-            display: flex;
             flex-direction: column;
             justify-content: center;
+            transform-origin: left center;
         }
 
         .page.active {
             display: flex;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(50px); }
-            to { opacity: 1; transform: translateX(0); }
+        .page.page-turn-next {
+            animation: pageTurnNext 0.6s ease-in-out;
+        }
+
+        .page.page-turn-prev {
+            animation: pageTurnPrev 0.6s ease-in-out;
+        }
+
+        @keyframes pageTurnNext {
+            0% {
+                transform: perspective(1200px) rotateY(-90deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: perspective(1200px) rotateY(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pageTurnPrev {
+            0% {
+                transform: perspective(1200px) rotateY(90deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: perspective(1200px) rotateY(0deg);
+                opacity: 1;
+            }
         }
 
         .story-text {
@@ -285,7 +322,9 @@
     <button class="music-toggle" onclick="toggleMusic()" id="musicButton">🎵</button>
 
     <div class="book-container">
-        <div class="unicorn">🦄</div>
+        <div class="unicorn">
+            <img src="mascot.png" alt="Unicorn Mascot" onerror="this.innerHTML='🦄'">
+        </div>
         <h1>🌈 EVE AND SOPHIE'S ADVENTURES 🌈</h1>
 
         <!-- Cover Page -->
@@ -525,14 +564,21 @@
             document.removeEventListener('click', startMusic);
         }, { once: true });
 
-        function showPage(pageNum) {
+        function showPage(pageNum, direction = 'next') {
             // Hide all pages
             document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
+                page.classList.remove('active', 'page-turn-next', 'page-turn-prev');
             });
 
-            // Show current page
-            document.getElementById('page' + pageNum).classList.add('active');
+            // Show current page with animation
+            const currentPageElement = document.getElementById('page' + pageNum);
+            currentPageElement.classList.add('active');
+
+            if (direction === 'next') {
+                currentPageElement.classList.add('page-turn-next');
+            } else {
+                currentPageElement.classList.add('page-turn-prev');
+            }
 
             // Update buttons
             document.getElementById('prevBtn').disabled = (pageNum === 0);
@@ -551,14 +597,14 @@
         function nextPage() {
             if (currentPage < totalPages - 1) {
                 currentPage++;
-                showPage(currentPage);
+                showPage(currentPage, 'next');
             }
         }
 
         function previousPage() {
             if (currentPage > 0) {
                 currentPage--;
-                showPage(currentPage);
+                showPage(currentPage, 'prev');
             }
         }
 
