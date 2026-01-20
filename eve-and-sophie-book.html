@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eve and Sophie's Adventures</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background clouds */
+        .cloud {
+            position: fixed;
+            background: white;
+            border-radius: 100px;
+            opacity: 0.7;
+            animation: float 20s infinite linear;
+        }
+
+        .cloud:before, .cloud:after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 100px;
+        }
+
+        .cloud1 {
+            width: 100px;
+            height: 40px;
+            top: 10%;
+            left: -100px;
+        }
+
+        .cloud1:before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud1:after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 120px;
+            height: 50px;
+            top: 30%;
+            left: -120px;
+            animation-delay: 7s;
+            animation-duration: 25s;
+        }
+
+        .cloud2:before {
+            width: 60px;
+            height: 60px;
+            top: -30px;
+            left: 15px;
+        }
+
+        .cloud2:after {
+            width: 70px;
+            height: 50px;
+            top: -20px;
+            right: 15px;
+        }
+
+        @keyframes float {
+            from { left: -150px; }
+            to { left: 110%; }
+        }
+
+        /* Flying stars */
+        .star {
+            position: fixed;
+            color: #FFD700;
+            font-size: 1.5em;
+            animation: twinkle 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .book-container {
+            background: linear-gradient(180deg, #fff9e6 0%, #ffffff 100%);
+            border-radius: 40px;
+            padding: 60px;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+            position: relative;
+            border: 5px solid #ffd700;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Unicorn mascot */
+        .unicorn {
+            position: absolute;
+            top: -80px;
+            right: 30px;
+            font-size: 8em;
+            animation: unicornFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.3));
+        }
+
+        @keyframes unicornFloat {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3.5em;
+            margin-bottom: 40px;
+            animation: gradient 3s ease infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .story-text {
+            font-size: 3.5em;
+            line-height: 1.8;
+            color: #2d3436;
+            margin: 30px 0;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .sight-word {
+            color: #ff6b6b;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 5px 15px;
+            border-radius: 15px;
+            display: inline-block;
+            animation: highlight 2s infinite;
+        }
+
+        @keyframes highlight {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .illustration-placeholder {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: #666;
+            margin: 30px 0;
+            border: 4px dashed #56cc9d;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 20px;
+        }
+
+        button {
+            font-size: 2em;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: 4px solid rgba(255,255,255,0.3);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-number {
+            text-align: center;
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* Music controls */
+        .music-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 2.5em;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .music-toggle:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background decorations -->
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="star" style="top: 15%; left: 10%;">⭐</div>
+    <div class="star" style="top: 25%; left: 85%; animation-delay: 1s;">✨</div>
+    <div class="star" style="top: 70%; left: 15%; animation-delay: 2s;">⭐</div>
+    <div class="star" style="top: 60%; left: 90%; animation-delay: 1.5s;">✨</div>
+
+    <!-- Music toggle button -->
+    <button class="music-toggle" onclick="toggleMusic()" id="musicButton">🎵</button>
+
+    <div class="book-container">
+        <div class="unicorn">🦄</div>
+        <h1>🌈 EVE AND SOPHIE'S ADVENTURES 🌈</h1>
+
+        <!-- Cover Page -->
+        <div class="page active" id="page0">
+            <div class="story-text">
+                A BOOK ABOUT<br>
+                EVE AND SOPHIE<br>
+                <span class="sight-word">AND</span><br>
+                THEIR UNICORN FRIEND
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 1 -->
+        <div class="page" id="page1">
+            <div class="story-text">
+                EVE <span class="sight-word">AND</span> SOPHIE<br>
+                <span class="sight-word">SEE</span> A BIG UNICORN.<br>
+                <span class="sight-word">THE</span> UNICORN <span class="sight-word">IS</span> PINK!
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 2 -->
+        <div class="page" id="page2">
+            <div class="story-text">
+                "<span class="sight-word">I</span> LIKE <span class="sight-word">THE</span> UNICORN!"<br>
+                SAYS EVE.<br>
+                "<span class="sight-word">ME</span> TOO!" SAYS SOPHIE.
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 3 -->
+        <div class="page" id="page3">
+            <div class="story-text">
+                <span class="sight-word">THE</span> UNICORN <span class="sight-word">CAN</span> FLY!<br>
+                <span class="sight-word">IT</span> GOES UP, UP, UP<br>
+                <span class="sight-word">IN</span> <span class="sight-word">THE</span> SKY.
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 4 -->
+        <div class="page" id="page4">
+            <div class="story-text">
+                "LET'S <span class="sight-word">GO</span> <span class="sight-word">AND</span> PLAY!"<br>
+                SAYS <span class="sight-word">THE</span> UNICORN.<br>
+                "<span class="sight-word">WE</span> <span class="sight-word">CAN</span> <span class="sight-word">RUN</span> <span class="sight-word">AND</span> JUMP!"
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 5 -->
+        <div class="page" id="page5">
+            <div class="story-text">
+                EVE, SOPHIE, <span class="sight-word">AND</span><br>
+                <span class="sight-word">THE</span> UNICORN<br>
+                <span class="sight-word">RUN</span> <span class="sight-word">TO</span> <span class="sight-word">THE</span> PARK.
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 6 -->
+        <div class="page" id="page6">
+            <div class="story-text">
+                THEY <span class="sight-word">SEE</span> A BIG TREE.<br>
+                THEY <span class="sight-word">SEE</span> <span class="sight-word">THE</span> SUN.<br>
+                <span class="sight-word">IT</span> <span class="sight-word">IS</span> A FUN DAY!
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 7 -->
+        <div class="page" id="page7">
+            <div class="story-text">
+                <span class="sight-word">THE</span> UNICORN MAKES<br>
+                A RAINBOW <span class="sight-word">WITH</span><br>
+                <span class="sight-word">ITS</span> MAGIC HORN!
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 8 -->
+        <div class="page" id="page8">
+            <div class="story-text">
+                "WOW!" SAYS EVE.<br>
+                "LOOK <span class="sight-word">AT</span> ALL<br>
+                <span class="sight-word">THE</span> COLORS!"
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 9 -->
+        <div class="page" id="page9">
+            <div class="story-text">
+                SOPHIE JUMPS <span class="sight-word">AND</span> LAUGHS.<br>
+                "<span class="sight-word">THIS</span> <span class="sight-word">IS</span> <span class="sight-word">THE</span> BEST!"<br>
+                <span class="sight-word">SHE</span> SAYS.
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 10 -->
+        <div class="page" id="page10">
+            <div class="story-text">
+                <span class="sight-word">THE</span> UNICORN GIVES<br>
+                EVE <span class="sight-word">AND</span> SOPHIE<br>
+                A RIDE <span class="sight-word">ON</span> <span class="sight-word">ITS</span> BACK.
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 11 -->
+        <div class="page" id="page11">
+            <div class="story-text">
+                THEY FLY UP HIGH!<br>
+                <span class="sight-word">THEY</span> <span class="sight-word">CAN</span> <span class="sight-word">SEE</span><br>
+                <span class="sight-word">THE</span> WHOLE WORLD!
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 12 -->
+        <div class="page" id="page12">
+            <div class="story-text">
+                <span class="sight-word">IT</span> <span class="sight-word">IS</span> TIME <span class="sight-word">TO</span> <span class="sight-word">GO</span> HOME.<br>
+                "<span class="sight-word">WILL</span> <span class="sight-word">YOU</span> COME BACK?"<br>
+                ASKS EVE.
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 13 -->
+        <div class="page" id="page13">
+            <div class="story-text">
+                "YES!" SAYS <span class="sight-word">THE</span> UNICORN.<br>
+                "<span class="sight-word">I</span> <span class="sight-word">WILL</span> <span class="sight-word">BE</span> BACK<br>
+                TOMORROW!"
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Page 14 -->
+        <div class="page" id="page14">
+            <div class="story-text">
+                EVE <span class="sight-word">AND</span> SOPHIE<br>
+                WAVE GOODBYE.<br>
+                "<span class="sight-word">WE</span> LOVE <span class="sight-word">YOU</span>!"
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Final Page -->
+        <div class="page" id="page15">
+            <div class="story-text">
+                <span class="sight-word">THE</span> END<br>
+                🦄🌈✨<br>
+                <br>
+                <span style="font-size: 0.6em;">MADE WITH LOVE FOR EVE AND SOPHIE</span>
+            </div>
+            <div class="illustration-placeholder">
+                [ILLUSTRATION HERE]
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button onclick="previousPage()" id="prevBtn">◀ BACK</button>
+            <button onclick="nextPage()" id="nextBtn">NEXT ▶</button>
+        </div>
+        <div class="page-number" id="pageNum">PAGE 1</div>
+    </div>
+
+    <!-- Background music -->
+    <audio id="bgMusic" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-happykids.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        let currentPage = 0;
+        const totalPages = 16;
+        let musicPlaying = false;
+
+        const bgMusic = document.getElementById('bgMusic');
+
+        // Music controls
+        function toggleMusic() {
+            const button = document.getElementById('musicButton');
+            if (musicPlaying) {
+                bgMusic.pause();
+                button.textContent = '🔇';
+                musicPlaying = false;
+            } else {
+                bgMusic.play().catch(e => console.log('Audio play failed:', e));
+                button.textContent = '🎵';
+                musicPlaying = true;
+            }
+        }
+
+        // Auto-start music on first interaction
+        document.addEventListener('click', function startMusic() {
+            if (!musicPlaying) {
+                bgMusic.play().catch(e => console.log('Audio play failed:', e));
+                musicPlaying = true;
+            }
+            document.removeEventListener('click', startMusic);
+        }, { once: true });
+
+        function showPage(pageNum) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show current page
+            document.getElementById('page' + pageNum).classList.add('active');
+
+            // Update buttons
+            document.getElementById('prevBtn').disabled = (pageNum === 0);
+            document.getElementById('nextBtn').disabled = (pageNum === totalPages - 1);
+
+            // Update page number
+            if (pageNum === 0) {
+                document.getElementById('pageNum').textContent = 'COVER';
+            } else if (pageNum === totalPages - 1) {
+                document.getElementById('pageNum').textContent = 'THE END';
+            } else {
+                document.getElementById('pageNum').textContent = 'PAGE ' + pageNum;
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') previousPage();
+        });
+
+        // Initialize
+        showPage(0);
+    </script>
+</body>
+</html>
