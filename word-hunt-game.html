@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Hunt Adventure!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background clouds */
+        .cloud {
+            position: fixed;
+            background: white;
+            border-radius: 100px;
+            opacity: 0.7;
+            animation: float 20s infinite linear;
+        }
+
+        .cloud:before, .cloud:after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 100px;
+        }
+
+        .cloud1 {
+            width: 100px;
+            height: 40px;
+            top: 10%;
+            left: -100px;
+        }
+
+        .cloud1:before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud1:after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 120px;
+            height: 50px;
+            top: 30%;
+            left: -120px;
+            animation-delay: 7s;
+            animation-duration: 25s;
+        }
+
+        .cloud2:before {
+            width: 60px;
+            height: 60px;
+            top: -30px;
+            left: 15px;
+        }
+
+        .cloud2:after {
+            width: 70px;
+            height: 50px;
+            top: -20px;
+            right: 15px;
+        }
+
+        @keyframes float {
+            from { left: -150px; }
+            to { left: 110%; }
+        }
+
+        /* Flying stars */
+        .star {
+            position: fixed;
+            color: #FFD700;
+            font-size: 1.5em;
+            animation: twinkle 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .game-container {
+            background: linear-gradient(180deg, #fff9e6 0%, #ffffff 100%);
+            border-radius: 40px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+            position: relative;
+            border: 5px solid #ffd700;
+        }
+
+        /* Mascot character */
+        .mascot {
+            position: absolute;
+            top: -100px;
+            right: 30px;
+            width: 200px;
+            height: 200px;
+            animation: mascotDance 3s ease-in-out infinite;
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.3));
+        }
+
+        .mascot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @keyframes mascotDance {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+            25% {
+                transform: translateY(-15px) rotate(-5deg) scale(1.05);
+            }
+            50% {
+                transform: translateY(-25px) rotate(0deg) scale(1.1);
+            }
+            75% {
+                transform: translateY(-15px) rotate(5deg) scale(1.05);
+            }
+            100% {
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            animation: gradient 3s ease infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .game-phase {
+            display: none;
+        }
+
+        .game-phase.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Phase 1: Building */
+        .build-phase {
+            text-align: center;
+        }
+
+        .instruction {
+            font-size: 2.2em;
+            color: #2d3436;
+            margin-bottom: 30px;
+            font-weight: bold;
+            text-shadow: 2px 2px 0px rgba(255, 215, 0, 0.3);
+        }
+
+        .drop-zones {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px 0;
+        }
+
+        .drop-zone {
+            width: 110px;
+            height: 110px;
+            border: 5px dashed #feca57;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #667eea;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .drop-zone.filled {
+            background: linear-gradient(135deg, #a8e6cf 0%, #56cc9d 100%);
+            border-color: #56cc9d;
+            animation: fillPop 0.3s;
+            box-shadow: 0 5px 15px rgba(86, 204, 157, 0.4);
+        }
+
+        @keyframes fillPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .letter-tiles {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .letter-tile {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fd79a8 50%, #a29bfe 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5em;
+            font-weight: bold;
+            color: white;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+            transition: all 0.2s;
+            border: 4px solid rgba(255,255,255,0.5);
+            position: relative;
+        }
+
+        .letter-tile:before {
+            content: '✨';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 0.5em;
+            animation: sparkle 1.5s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: rotate(0deg) scale(0); }
+            50% { opacity: 1; transform: rotate(180deg) scale(1); }
+        }
+
+        .letter-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        }
+
+        .letter-tile.dragging {
+            opacity: 0.7;
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .letter-tile.used {
+            opacity: 0.3;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        /* Phase 2: Hunting */
+        .hunt-phase {
+            text-align: center;
+        }
+
+        .story-text {
+            font-size: 2.8em;
+            line-height: 2;
+            color: #2d3436;
+            margin: 30px 0;
+            font-weight: 600;
+        }
+
+        .story-text span {
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .story-text span.target-word:hover {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            transform: scale(1.1);
+        }
+
+        .story-text span.found {
+            background: linear-gradient(135deg, #a8e6cf 0%, #56cc9d 100%);
+            color: white;
+            font-weight: bold;
+            animation: foundWord 0.5s;
+        }
+
+        @keyframes foundWord {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.3) rotate(-5deg); }
+            50% { transform: scale(1.3) rotate(5deg); }
+            75% { transform: scale(1.3) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .progress {
+            font-size: 2.5em;
+            color: #667eea;
+            margin: 20px 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 0px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Confetti celebration */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: confetti-fall 3s linear;
+            pointer-events: none;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .celebration {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8em;
+            animation: celebrate 1s ease-in-out;
+            z-index: 1000;
+            filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));
+        }
+
+        @keyframes celebrate {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1.5) rotate(180deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(360deg); }
+        }
+
+        .celebration.show {
+            display: block;
+        }
+
+        button.next-button {
+            font-size: 2.2em;
+            padding: 25px 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: 4px solid rgba(255,255,255,0.3);
+        }
+
+        button.next-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        button.next-button:active {
+            transform: translateY(0);
+        }
+
+        /* Music controls */
+        .music-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 2.5em;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .music-toggle:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background decorations -->
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="star" style="top: 15%; left: 10%;">⭐</div>
+    <div class="star" style="top: 25%; left: 85%; animation-delay: 1s;">✨</div>
+    <div class="star" style="top: 70%; left: 15%; animation-delay: 2s;">⭐</div>
+    <div class="star" style="top: 60%; left: 90%; animation-delay: 1.5s;">✨</div>
+
+    <!-- Music toggle button -->
+    <button class="music-toggle" onclick="toggleMusic()" id="musicButton">🎵</button>
+
+    <div class="game-container">
+        <div class="mascot" id="mascot">
+            <img src="mascot.png" alt="Mascot" onerror="this.parentElement.innerHTML='🦉'">
+        </div>
+        <h1>🌟 Word Hunt Adventure! 🌟</h1>
+
+        <!-- Phase 1: Build the word -->
+        <div class="game-phase build-phase active">
+            <div class="instruction">🎯 Drag the letters to spell the word!</div>
+            <div class="drop-zones" id="dropZones"></div>
+            <div class="letter-tiles" id="letterTiles"></div>
+        </div>
+
+        <!-- Phase 2: Hunt for the word -->
+        <div class="game-phase hunt-phase">
+            <div class="instruction">🔍 Find and click all the <span id="huntTargetWord" style="color: #ff6b6b;"></span> words!</div>
+            <div class="progress" id="progress"></div>
+            <div class="story-text" id="storyText"></div>
+            <button class="next-button" onclick="nextWord()" style="display: none;" id="nextWordButton">Next Word! 🎉</button>
+        </div>
+
+        <div class="celebration" id="celebration">🎉</div>
+    </div>
+
+    <!-- Background music -->
+    <audio id="bgMusic" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-ukulele.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="successSound">
+        <source src="https://www.soundjay.com/buttons/sounds/button-09.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // List of sight words with sentences
+        const words = [
+            {
+                word: 'the',
+                extraLetters: ['a', 'b', 's'],
+                story: 'The cat sat on the mat. The dog ran to the park. I love the sun!'
+            },
+            {
+                word: 'and',
+                extraLetters: ['b', 'c', 't'],
+                story: 'The cat and the dog. Mom and dad. You and me and the tree.'
+            },
+            {
+                word: 'cat',
+                extraLetters: ['b', 'd', 's'],
+                story: 'The cat is big. A cat can run. My cat is fun.'
+            },
+            {
+                word: 'dog',
+                extraLetters: ['c', 'a', 't'],
+                story: 'The dog can run. My dog is big. The dog and the cat.'
+            },
+            {
+                word: 'run',
+                extraLetters: ['a', 's', 't'],
+                story: 'I can run fast. Dogs run and play. Let us run to the tree.'
+            }
+        ];
+
+        let currentWordIndex = 0;
+        let currentWord = words[currentWordIndex];
+        let foundCount = 0;
+        let totalCount = 0;
+        let draggedElement = null;
+        let builtWord = [];
+        let musicPlaying = false;
+
+        const bgMusic = document.getElementById('bgMusic');
+        const successSound = document.getElementById('successSound');
+
+        // Music controls
+        function toggleMusic() {
+            const button = document.getElementById('musicButton');
+            if (musicPlaying) {
+                bgMusic.pause();
+                button.textContent = '🔇';
+                musicPlaying = false;
+            } else {
+                bgMusic.play().catch(e => console.log('Audio play failed:', e));
+                button.textContent = '🎵';
+                musicPlaying = true;
+            }
+        }
+
+        // Auto-start music on first interaction
+        document.addEventListener('click', function startMusic() {
+            if (!musicPlaying) {
+                bgMusic.play().catch(e => console.log('Audio play failed:', e));
+                musicPlaying = true;
+            }
+            document.removeEventListener('click', startMusic);
+        }, { once: true });
+
+        // Initialize game
+        function initGame() {
+            currentWord = words[currentWordIndex];
+            setupBuildPhase();
+        }
+
+        // Setup build phase
+        function setupBuildPhase() {
+            const dropZones = document.getElementById('dropZones');
+            const letterTiles = document.getElementById('letterTiles');
+
+            dropZones.innerHTML = '';
+            letterTiles.innerHTML = '';
+            builtWord = [];
+
+            // Create drop zones
+            for (let i = 0; i < currentWord.word.length; i++) {
+                const zone = document.createElement('div');
+                zone.className = 'drop-zone';
+                zone.dataset.index = i;
+                dropZones.appendChild(zone);
+            }
+
+            // Create letter tiles (word letters + extra letters, shuffled)
+            const letters = currentWord.word.split('').concat(currentWord.extraLetters);
+            letters.sort(() => Math.random() - 0.5);
+
+            letters.forEach((letter, index) => {
+                const tile = document.createElement('div');
+                tile.className = 'letter-tile';
+                tile.textContent = letter;
+                tile.dataset.letter = letter;
+                tile.dataset.id = index;
+
+                // Mouse events
+                tile.addEventListener('mousedown', startDrag);
+
+                // Touch events
+                tile.addEventListener('touchstart', startDrag);
+
+                letterTiles.appendChild(tile);
+            });
+
+            // Add drop event listeners
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', drag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            const tile = e.target;
+            if (tile.classList.contains('used')) return;
+
+            draggedElement = tile;
+            tile.classList.add('dragging');
+        }
+
+        function drag(e) {
+            if (!draggedElement) return;
+            e.preventDefault();
+        }
+
+        function endDrag(e) {
+            if (!draggedElement) return;
+            e.preventDefault();
+
+            const clientX = e.clientX || (e.changedTouches && e.changedTouches[0].clientX);
+            const clientY = e.clientY || (e.changedTouches && e.changedTouches[0].clientY);
+
+            const dropZone = document.elementFromPoint(clientX, clientY);
+
+            if (dropZone && dropZone.classList.contains('drop-zone') && !dropZone.classList.contains('filled')) {
+                const index = parseInt(dropZone.dataset.index);
+                const letter = draggedElement.dataset.letter;
+
+                dropZone.textContent = letter.toUpperCase();
+                dropZone.classList.add('filled');
+                draggedElement.classList.add('used');
+
+                builtWord[index] = letter;
+
+                // Check if word is complete
+                if (builtWord.length === currentWord.word.length && !builtWord.includes(undefined)) {
+                    checkBuiltWord();
+                }
+            }
+
+            draggedElement.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function checkBuiltWord() {
+            const built = builtWord.join('');
+            if (built === currentWord.word) {
+                celebrate();
+                setTimeout(() => {
+                    document.querySelector('.build-phase').classList.remove('active');
+                    document.querySelector('.hunt-phase').classList.add('active');
+                    setupHuntPhase();
+                }, 1500);
+            } else {
+                // Wrong word, reset
+                setTimeout(() => {
+                    setupBuildPhase();
+                }, 500);
+            }
+        }
+
+        // Setup hunt phase
+        function setupHuntPhase() {
+            const storyText = document.getElementById('storyText');
+            const words = currentWord.story.split(' ');
+            foundCount = 0;
+            totalCount = 0;
+
+            storyText.innerHTML = '';
+
+            words.forEach((word, index) => {
+                const span = document.createElement('span');
+                const cleanWord = word.toLowerCase().replace(/[.,!?]/g, '');
+
+                if (cleanWord === currentWord.word) {
+                    span.className = 'target-word';
+                    span.onclick = () => foundWord(span);
+                    totalCount++;
+                }
+
+                span.textContent = word;
+                storyText.appendChild(span);
+
+                if (index < words.length - 1) {
+                    storyText.appendChild(document.createTextNode(' '));
+                }
+            });
+
+            updateProgress();
+            document.getElementById('huntTargetWord').textContent = currentWord.word.toUpperCase();
+        }
+
+        function foundWord(element) {
+            if (element.classList.contains('found')) return;
+
+            element.classList.add('found');
+            foundCount++;
+            celebrate();
+            updateProgress();
+
+            if (foundCount === totalCount) {
+                setTimeout(() => {
+                    document.getElementById('nextWordButton').style.display = 'block';
+                }, 1000);
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('progress').textContent = `Found: ${foundCount} / ${totalCount} ⭐`;
+        }
+
+        function celebrate() {
+            const celebration = document.getElementById('celebration');
+            celebration.classList.add('show');
+
+            // Create confetti
+            createConfetti();
+
+            // Play success sound
+            successSound.currentTime = 0;
+            successSound.play().catch(e => console.log('Sound play failed:', e));
+
+            setTimeout(() => {
+                celebration.classList.remove('show');
+            }, 1000);
+        }
+
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a8e6cf', '#ffd93d', '#ff6bcb'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        function nextWord() {
+            currentWordIndex++;
+            if (currentWordIndex >= words.length) {
+                // Create special end celebration
+                alert('🎉 AMAZING JOB! You found all the words! You\'re a SUPERSTAR! 🌟');
+                currentWordIndex = 0;
+            }
+
+            currentWord = words[currentWordIndex];
+            document.querySelector('.hunt-phase').classList.remove('active');
+            document.querySelector('.build-phase').classList.add('active');
+            document.getElementById('nextWordButton').style.display = 'none';
+            initGame();
+        }
+
+        // Start the game
+        initGame();
+    </script>
+</body>
+</html>
