@@ -109,19 +109,24 @@
         }
 
         .mascot-speaker {
-            position: absolute;
-            top: -100px;
-            right: 30px;
-            width: 200px;
-            height: 200px;
+            display: block;
+            margin: 0 auto 30px auto;
+            width: 250px;
+            height: 250px;
             cursor: pointer;
             animation: mascotFloat 3s ease-in-out infinite;
             filter: drop-shadow(0 8px 15px rgba(0,0,0,0.3));
             transition: transform 0.2s;
+            border: 6px solid #ffd700;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
         }
 
         .mascot-speaker:hover {
             transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.7);
         }
 
         .mascot-speaker img {
@@ -131,8 +136,8 @@
         }
 
         @keyframes mascotFloat {
-            0%, 100% { transform: translateY(0) rotate(-5deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
         }
 
         .instruction {
@@ -142,6 +147,20 @@
             font-weight: bold;
             text-align: center;
             text-shadow: 2px 2px 0px rgba(255, 215, 0, 0.3);
+        }
+
+        .click-me {
+            text-align: center;
+            font-size: 1.5em;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
         }
 
         .word-display {
@@ -310,16 +329,18 @@
     <div class="star" style="top: 70%; left: 15%; animation-delay: 2s;">⭐</div>
 
     <div class="game-container">
+        <h1>🔤 Word Builder! 🔤</h1>
+
+        <div class="progress" id="progress">Level 1 of 10</div>
+
+        <div class="click-me">👇 CLICK THE UNICORN! 👇</div>
+
         <div class="mascot-speaker" onclick="speakWord()" id="mascotButton">
             <img src="mascot.png" alt="Mascot" onerror="this.innerHTML='🦄'">
         </div>
 
-        <h1>🔤 Word Builder! 🔤</h1>
-
-        <div class="progress" id="progress">Level 1 of 5</div>
-
         <div class="instruction" id="instruction">
-            Click the unicorn to hear the word!
+            Listen and build the word!
         </div>
 
         <div class="word-display" id="wordDisplay"></div>
@@ -342,72 +363,72 @@
             {
                 baseWord: "he",
                 targetWord: "she",
-                lockedPositions: [],
-                availableLetters: ['s', 'h', 'e', 't', 'w'],
-                hint: "Add one letter to make 'she'"
+                lockedPositions: [1, 2],  // "he" is locked
+                availableLetters: ['s', 't', 'w', 'm', 'b'],
+                hint: "Add one letter before HE"
             },
             {
                 baseWord: "he",
                 targetWord: "the",
-                lockedPositions: [],
-                availableLetters: ['t', 'h', 'e', 's', 'm'],
-                hint: "Change a letter to make 'the'"
+                lockedPositions: [2],  // "e" is locked
+                availableLetters: ['t', 'h', 's', 'w', 'm'],
+                hint: "Make THE (keep the E)"
             },
             {
                 baseWord: "he",
                 targetWord: "we",
-                lockedPositions: [],
-                availableLetters: ['w', 'e', 'h', 's', 't'],
-                hint: "Change a letter to make 'we'"
+                lockedPositions: [1],  // "e" is locked
+                availableLetters: ['w', 'h', 's', 't', 'm'],
+                hint: "Make WE (keep the E)"
             },
             {
                 baseWord: "the",
                 targetWord: "them",
                 lockedPositions: [0, 1, 2],
                 availableLetters: ['m', 'n', 's', 'y', 'r'],
-                hint: "Add one letter to 'the'"
+                hint: "Add one letter after THE"
             },
             {
                 baseWord: "the",
                 targetWord: "then",
                 lockedPositions: [0, 1, 2],
                 availableLetters: ['n', 'm', 's', 'y', 'r'],
-                hint: "Add one letter to 'the'"
+                hint: "Add one letter after THE"
             },
             {
                 baseWord: "the",
                 targetWord: "they",
                 lockedPositions: [0, 1, 2],
                 availableLetters: ['y', 'n', 'm', 's', 'r'],
-                hint: "Add one letter to 'the'"
+                hint: "Add one letter after THE"
             },
             {
-                baseWord: "when",
+                baseWord: "en",
                 targetWord: "then",
-                lockedPositions: [1, 2, 3],
-                availableLetters: ['t', 'w', 's', 'm', 'y'],
-                hint: "Change one letter"
+                lockedPositions: [2, 3],  // "en" is locked
+                availableLetters: ['t', 'h', 'w', 'm', 's'],
+                hint: "Add letters before EN"
             },
             {
-                baseWord: "can",
+                baseWord: "an",
                 targetWord: "man",
-                lockedPositions: [1, 2],
+                lockedPositions: [1, 2],  // "an" is locked
                 availableLetters: ['m', 'c', 'p', 'r', 't'],
-                hint: "Change the first letter"
+                hint: "Add one letter before AN"
             },
             {
-                baseWord: "run",
+                baseWord: "un",
                 targetWord: "fun",
-                lockedPositions: [1, 2],
+                lockedPositions: [1, 2],  // "un" is locked
                 availableLetters: ['f', 'r', 's', 'b', 'g'],
-                hint: "Change the first letter"
+                hint: "Add one letter before UN"
             },
             {
-                baseWord: "big",
+                baseWord: "ig",
                 targetWord: "pig",
-                lockedPositions: [1, 2],
+                lockedPositions: [1, 2],  // "ig" is locked
                 availableLetters: ['p', 'b', 'd', 'w', 'f'],
-                hint: "Change the first letter"
+                hint: "Add one letter before IG"
             }
         ];
 
@@ -423,8 +444,19 @@
         // Load voices
         function loadVoices() {
             const voices = synth.getVoices();
-            // Try to find a female/child-like voice
-            voice = voices.find(v => v.name.includes('Female') || v.name.includes('Samantha') || v.lang.startsWith('en')) || voices[0];
+            // Try to find a female voice - prioritize these names
+            voice = voices.find(v =>
+                v.name.includes('Samantha') ||
+                v.name.includes('Victoria') ||
+                v.name.includes('Karen') ||
+                v.name.includes('Susan') ||
+                v.name.includes('Moira') ||
+                v.name.includes('Female') ||
+                v.name.includes('Woman') ||
+                (v.lang.startsWith('en') && !v.name.includes('Male'))
+            ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+
+            console.log('Selected voice:', voice ? voice.name : 'default');
         }
 
         // Load voices when available
@@ -441,16 +473,16 @@
                 utterance.voice = voice;
             }
 
-            // Make it sound more child-like
-            utterance.pitch = 1.3;
-            utterance.rate = 0.9;
+            // Make it sound more feminine and child-like
+            utterance.pitch = 1.5;  // Higher pitch for more feminine sound
+            utterance.rate = 0.85;  // Slightly slower for clarity
 
             synth.cancel(); // Stop any current speech
             synth.speak(utterance);
 
             // Visual feedback
             const mascot = document.getElementById('mascotButton');
-            mascot.style.transform = 'scale(1.2)';
+            mascot.style.transform = 'scale(1.2) rotate(5deg)';
             setTimeout(() => {
                 mascot.style.transform = '';
             }, 300);
